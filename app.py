@@ -61,6 +61,10 @@ For each answer option, please explain why the answer is wrong or right in this 
 Module and Presentation Selection
 You must categorise with the following lists from the UKMLA"""
 
+# Initialize saved prompts
+if "saved_prompts" not in st.session_state:
+    st.session_state.saved_prompts = ["Please make the stem more concise"]
+
 # Page header
 st.title("Claude Chatbot")
 st.markdown("Chat with Claude using the Anthropic API")
@@ -92,6 +96,37 @@ with st.sidebar:
         if st.button("Apply Changes"):
             st.session_state.messages = []
             st.rerun()
+    
+    # Common Prompts section
+    st.subheader("Common Prompts")
+    
+    # Text input for new prompts
+    new_prompt = st.text_input(
+        "Add a new prompt",
+        placeholder="Please make the stem more concise"
+    )
+    
+    # Save button for new prompts
+    if new_prompt and st.button("Save Prompt"):
+        if new_prompt not in st.session_state.saved_prompts:
+            st.session_state.saved_prompts.append(new_prompt)
+            st.success("Prompt saved!")
+            st.rerun()
+    
+    # Display saved prompts with copy buttons
+    if st.session_state.saved_prompts:
+        st.write("Your saved prompts:")
+        for i, prompt in enumerate(st.session_state.saved_prompts):
+            col1, col2, col3 = st.columns([0.7, 0.15, 0.15])
+            with col1:
+                st.text_area(f"Prompt {i+1}", prompt, height=68, key=f"prompt_{i}")
+            with col2:
+                if st.button("Copy", key=f"copy_{i}"):
+                    st.success("Copied!")
+            with col3:
+                if st.button("Delete", key=f"delete_{i}"):
+                    st.session_state.saved_prompts.pop(i)
+                    st.rerun()
     
     # Clear chat button
     if st.button("Clear Chat"):
